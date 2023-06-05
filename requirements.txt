@@ -1,0 +1,7 @@
+beautifulsoup4
+colorama
+imdbpy
+imageio
+prettytable
+python-dotenv
+requests

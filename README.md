@@ -5,7 +5,8 @@ Media File Renamer and Subtitle Finder is free software that basicly is a python
 # Installation On Windows
 - create a folder called `subtitle` inside C:/ and extract all files inside it. like follow
 - یک پوشه به نام `subtitle` تو درایو C درست کنین و محتوای این ریپازیتوری رو توش بریزید. مثل تصویر زیر:
-- 
+
+
 ![Folder Structure](/Images/1.PNG)
 
 - type `shell:sendto` inside run and hit enter. copy `renameMovieName.cmd` file from Batches folder into sendto folder. make sure `SCRIPT_PATH` inside the `renameMovieName.cmd` is correct

@@ -14,5 +14,5 @@ Media File Renamer and Subtitle Finder is free software that basicly is a python
 `OMDB_API_KEY=sdfksdfn54`
 - سایت `http://www.omdbapi.com/apikey.aspx` رو بازکنین و درخواست یه apikey بدید تا براتون ایمیل بشه. از تو ایمیل کپی کنین و به جای [your-api-key-for-omdb] تو فایل config.env قرار بدید.  
 - right click on a movie file and choose `renameMovieName`. it will show you the available options.
-- رو فیلم مورد نظر کلیک راست کنین و از گزینه sendto  گزینه renameMovieName رو انتاخب کنید و بقیه گزینه ها رو اسکریپت ازتون سوال می کنه.
+- رو فیلم مورد نظر کلیک راست کنین و از گزینه sendto  گزینه renameMovieName رو انتخاب کنید و بقیه گزینه ها رو اسکریپت ازتون سوال می کنه.
 - موفق باشید

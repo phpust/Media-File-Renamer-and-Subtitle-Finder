@@ -8,7 +8,7 @@ import re
 
 def is_movie_file(file_path):
     movie_extensions = ['.avi', '.mkv', '.mp4', '.wmv', '.mov', '.flv', '.m4v', '.mpg', '.mpeg', '.3gp', '.vob', '.ts', '.webm', '.ogv', '.m2ts', '.mpe', '.mpv']  
-    return any(file_path.lower().endswith(ext) for ext in movie_extensions)
+    return any(str(file_path).lower().endswith(ext) for ext in movie_extensions)
 
 def get_clean_filename(file_path):
 	# Split the file name and extension
@@ -70,11 +70,22 @@ def check_folder_existence(path, folder_name, level):
     return False
 
 
+# With a criteria (skip hidden files)
+def is_not_hidden_and_is_movie(path):
+    return not path.name.startswith(".") and ( os.path.isdir(path) or is_movie_file(path))
+
 def rename_and_move_to_new_path(old_path, new_path):
     # Renamed and moved
-    print(f"file renamed and moved to: {new_path}")
     os.makedirs(os.path.dirname(new_path), exist_ok=True)
+    # only create metadata file
+    if new_path==old_path:
+    	return True
+    elif os.path.exists(new_path):
+        print(f"File already exists at {new_path}, skipping...")
+        return False
     shutil.move(old_path, new_path)
+    print(f"File moved successfully to {new_path}!")
+    return True
 
 def create_file_at(folder_path, file_name, file_content):
     try:

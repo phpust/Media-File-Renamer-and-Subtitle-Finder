@@ -7,6 +7,7 @@ import shutil
 import re
 from dotenv import load_dotenv
 from utils import file_helpers
+from utils import displayable_path
 import colorama
 from colorama import init
 init()
@@ -81,6 +82,7 @@ def search_movie_id_imdb(old_name):
         search_results = response.json().get("d", [])
         if search_results:
             movie_data = {}
+            movie_data_without_year = {}
             for result in search_results:
                 # filter only movies
                 if result.get("qid") in ["movie", "video", "short", "tvMovie"]:
@@ -89,6 +91,10 @@ def search_movie_id_imdb(old_name):
                     movie_year = result.get("y")
                     if year is not None and year==movie_year:
                         movie_data[movie_id] = {"title": movie_name, "year": movie_year}
+                    else:
+                        movie_data_without_year[movie_id] = {"title": movie_name, "year": movie_year}
+
+            movie_data.update(movie_data_without_year)
             return movie_data
     
     return None
@@ -119,7 +125,11 @@ def one_movie(file_path, automatic=False):
                 movie_name = movie_data[movie_id]["title"]
                 movie_year = movie_data[movie_id]["year"]
                 print(f"{i+1}. {movie_name} ({movie_year})")
-            selected_index = int(input("Enter the index of the movie you want to select: ")) - 1
+            selected_index = input("Enter the index of the movie you want to select: ")
+            if len(selected_index) > 0 :
+                selected_index = int(selected_index) - 1
+            else:
+                selected_index = -1
         else:
             # select the only existing result automaticaly
             selected_index = 0
@@ -130,25 +140,33 @@ def one_movie(file_path, automatic=False):
             formatted_movie_name = format_movie_name_omdb(selected_movie_id) + old_name_extention
             
             renamed_path = file_helpers.get_formatted_path_with_merging_check(file_path, formatted_movie_name)
-            file_helpers.rename_and_move_to_new_path(file_path, renamed_path)
-            # add imdbID file to metadata file.
-            file_helpers.create_file_at(file_helpers.get_parent_folder(renamed_path), ".metadata", selected_movie_id)
-            file_helpers.hide_file(file_helpers.get_parent_folder(renamed_path), ".metadata")
+            if file_helpers.rename_and_move_to_new_path(file_path, renamed_path) :
+                # add imdbID file to metadata file.
+                file_helpers.create_file_at(file_helpers.get_parent_folder(renamed_path), ".metadata", selected_movie_id)
+                file_helpers.hide_file(file_helpers.get_parent_folder(renamed_path), ".metadata")
         else:
             print("Invalid selection.")
     else:
         print("movie not found.")
 
+
+
 def main(folder_path):
     print(f"How do you want to do rename ?")
-    print(f"choose between this two option :")
+    print(f"choose between this three option :")
     print(f"1. Automaticaly ")
     print(f"2. Supervision")
+    print(f"3. Show File Tree")
     choice = input("Your choice: ").strip().lower()
     if choice=="1":
         choice = True
-    else:
+    elif choice=="2":
         choice = False
+    else:
+        paths = displayable_path.DisplayablePath.make_tree(Path(folder_path), criteria=file_helpers.is_not_hidden_and_is_movie)
+        for path in paths:
+            print(path.displayable())
+        return
     # handle folder of movies
     if os.path.isdir(folder_path):
         for root, directories, files in os.walk(folder_path):

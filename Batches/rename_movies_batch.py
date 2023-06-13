@@ -13,7 +13,7 @@ parent = os.path.dirname(current)
 # the sys.path.
 sys.path.append(parent)
 
-import rename_movie
+import rename_movies
 
 file_path = sys.argv[1]
-rename_movie.main(file_path)
+rename_movies.main(file_path)

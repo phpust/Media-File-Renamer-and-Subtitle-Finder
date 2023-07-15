@@ -8,7 +8,17 @@ import re
 
 def is_movie_file(file_path):
     movie_extensions = ['.avi', '.mkv', '.mp4', '.wmv', '.mov', '.flv', '.m4v', '.mpg', '.mpeg', '.3gp', '.vob', '.ts', '.webm', '.ogv', '.m2ts', '.mpe', '.mpv']  
-    return any(str(file_path).lower().endswith(ext) for ext in movie_extensions)
+    return is_in_extension_list(file_path, movie_extensions)
+
+def is_subtitle_file_downloaded(file_path):
+    extensions = ['.downloaded']  
+    return is_in_extension_list(file_path, extensions)
+
+def get_downloading_file_path(folder_name):
+    return os.path.join(folder_name, ".downloading")
+
+def is_in_extension_list(file_path, extensions):
+    return any(str(file_path).lower().endswith(ext) for ext in extensions)
 
 def get_clean_filename(file_path):
 	# Split the file name and extension
@@ -56,18 +66,13 @@ def get_formatted_path_with_merging_check(source_path, formatted_name):
     return formatted_path
 
 
-def check_folder_existence(path, folder_name, level):
+def check_folder_existence(path, folder_name, level=0):
     # Get the two top-level parent folders
     for i in range(level):
         path = os.path.dirname(path)
-        pass
 
     # Check if the specific folder exists in either of the two parent folders
-    folder_path = os.path.join(path, folder_name)
-
-    if os.path.exists(folder_path):
-        return True
-    return False
+    return os.path.exists( os.path.join(path, folder_name) )
 
 
 # With a criteria (skip hidden files)
@@ -103,19 +108,22 @@ def hide_file(folder_path, file_name):
         print(e)
 
 def file_already_exist(file_path):
-    if os.path.exists(file_path):
-        return True
-    return False
+    return os.path.exists(file_path)
+
+def file_already_exist_in(folder_path, file_name):
+    return os.path.exists(os.path.join(folder_path, file_name))
+
+def delete_file_from(folder_path, file_name):
+    os.remove(os.path.join(folder_path, file_name))
 
 def read_file_contents(file_path):
-	with open(os.path.join(folder_path, file_path), "r") as f:
-		return f.read().splitlines()
+    with open(file_path, "r") as f:
+        return f.read().splitlines()
 
 def check_file_already_contains(file_path, content):
     if file_already_exist(file_path):
         contents = read_file_contents(file_path)
-        if content in contents:
-            return True
+        return content in contents
     return False
 
 # check if first file is added sooner than the second file
@@ -123,3 +131,13 @@ def check_file_already_contains(file_path, content):
 # metadata file. so if movie added after metadata file then this movie must be checked again.
 def file_added_sooner(file_path, metadata_path):
 	return int(os.path.getctime(file_path)) <= int(os.path.getctime(metadata_path))
+
+
+def walk_through(folder_path, operation, *args):
+    if os.path.isdir(folder_path):
+        for root, directories, files in os.walk(folder_path):
+            for file in files:
+                file_path = os.path.join(root, file)
+                if operation(file_path, *args):
+                    return True
+    return False
